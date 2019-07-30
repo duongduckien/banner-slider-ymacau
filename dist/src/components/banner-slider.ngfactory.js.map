@@ -1,0 +1,1 @@
+{"version":3,"file":"banner-slider.ngfactory.js","sourceRoot":"","sources":["../../../src/components/banner-slider.ngfactory.ts","../../../src/components/banner-slider.html"],"names":[],"mappings":";;;;;;;;;;;;uECAA,2EAAI,KAAA,iDAAoB","sourcesContent":["import * as i0 from '@angular/core';\ni0.ComponentFactory;\n","<h1>Banner Slider YMacau</h1>"]}

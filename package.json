@@ -1,14 +1,14 @@
 {
   "name": "banner-slider-ymacau",
-  "version": "0.0.1",
+  "version": "0.0.4",
   "description": "",
-  "main": "./dist/index.js",
-  "typings": "./dist/index.d.ts",
+  "main": "./dist/src/index.js",
+  "typings": "./dist/src/index.d.ts",
   "files": "dist",
   "scripts": {
     "ngc": "ngc",
     "build": "rm -rf aot dist && npm run ngc",
-    "publishPackage": "npm run build && npm publish"
+    "publish": "npm run build && npm publish"
   },
   "repository": {
     "type": "git",
@@ -29,8 +29,8 @@
     "@angular/platform-browser": "^7.2.2",
     "@angular/platform-browser-dynamic": "^7.2.2",
     "@types/node": "~12.0.0",
-    "zone.js": "~0.8.29",
     "rxjs": "~6.5.1",
-    "typescript": "~3.1.6"
+    "typescript": "~3.1.6",
+    "zone.js": "~0.8.29"
   }
 }
