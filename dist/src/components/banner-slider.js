@@ -14,8 +14,8 @@ var BannerSliderComponent = /** @class */ (function () {
     BannerSliderComponent = __decorate([
         Component({
             selector: 'banner-slider-ymacau',
-            templateUrl: 'banner-slider.html',
-            styleUrls: ['banner-slider.scss']
+            template: "<h1>Banner Slider YMacau</h1>",
+            styles: [""]
         }),
         __metadata("design:paramtypes", [])
     ], BannerSliderComponent);

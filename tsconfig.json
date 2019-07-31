@@ -17,6 +17,7 @@
     "scripts"
   ],
   "angularCompilerOptions": {
-    "genDir": "aot"
+    "genDir": "aot",
+    "enableResourceInlining": true
   }
 }
