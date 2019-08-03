@@ -7,8 +7,9 @@
   "files": "dist",
   "scripts": {
     "ngc": "ngc",
-    "build": "rm -rf aot dist && npm run ngc",
-    "publish": "npm run build && npm publish"
+    "build": "rm -rf aot dist && npm run ngc && npm run copy:assets",
+    "publish": "npm run build && npm publish",
+    "copy:assets": "cpx 'src/assets/**' 'dist/src/assets'"
   },
   "repository": {
     "type": "git",
@@ -29,8 +30,13 @@
     "@angular/platform-browser": "^7.2.2",
     "@angular/platform-browser-dynamic": "^7.2.2",
     "@types/node": "~12.0.0",
+    "cpx": "^1.5.0",
     "rxjs": "~6.5.1",
     "typescript": "~3.1.6",
     "zone.js": "~0.8.29"
+  },
+  "dependencies": {
+    "jquery": "^3.4.1",
+    "slick-carousel": "^1.8.1"
   }
 }

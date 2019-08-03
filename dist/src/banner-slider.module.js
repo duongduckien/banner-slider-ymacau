@@ -5,8 +5,10 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 import { NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { BannerSliderComponent } from './components/banner-slider';
 import { BannerSliderService } from './services/banner-slider.service';
+import { SafePipe } from './pipes/safe.pipe';
 var BannerSliderYMacauModule = /** @class */ (function () {
     function BannerSliderYMacauModule() {
     }
@@ -20,8 +22,12 @@ var BannerSliderYMacauModule = /** @class */ (function () {
     var BannerSliderYMacauModule_1;
     BannerSliderYMacauModule = BannerSliderYMacauModule_1 = __decorate([
         NgModule({
+            imports: [
+                CommonModule,
+            ],
             declarations: [
                 BannerSliderComponent,
+                SafePipe,
             ],
             exports: [
                 BannerSliderComponent,

@@ -1,1 +1,64 @@
-<h1>Banner Slider YMacau</h1>
+<div>
+    <div class="main-slider" *ngIf="slider.length > 0">
+        <div class="item-list" *ngFor="let item of slider; let i = index">
+            <div [ngSwitch]="item.type">
+                <ng-template [ngSwitchCase]="'image'">
+                    <div class="item image">
+                        <div class="item-wrapper">
+                            <div class="slide-image slide-media" [ngStyle]="{ 'background-image': 'url(' + item.src + ')' }">
+                                <img [attr.data-lazy]="item.src" class="image-entity" />
+                            </div>
+                        </div>
+                    </div>
+                </ng-template>
+
+                <ng-template [ngSwitchCase]="'video'">
+                    <div *ngIf="item.videoType === 'vimeo'" class="item vimeo">
+                        <div class="item-wrapper">
+                            <iframe 
+                                class="embed-player slide-media"
+                                [src]="createSource(item.src, 'vimeo') | safe"
+                                frameborder="0" 
+                                webkitallowfullscreen 
+                                mozallowfullscreen
+                                allowfullscreen
+                                [width]="config?.vimeo?.width" 
+                                [height]="config?.vimeo?.height" 
+                            ></iframe>
+                        </div>
+                    </div>
+
+                    <div *ngIf="item.videoType === 'youtube'" class="item youtube">
+                        <div class="item-wrapper">
+                            <iframe 
+                                class="embed-player slide-media"
+                                [src]="createSource(item.src, 'youtube') | safe"
+                                frameborder="0" 
+                                webkitallowfullscreen 
+                                mozallowfullscreen
+                                allowfullscreen
+                                [width]="config?.youtube?.width" 
+                                [height]="config?.youtube?.height" 
+                            ></iframe>
+                        </div>
+                    </div>
+
+                    <div *ngIf="item.videoType === 'local'" class="item video">
+                        <div class="item-wrapper">
+                            <video 
+                                class="slide-video slide-media" 
+                                playsinline 
+                                loop 
+                                muted 
+                                preload="metadata"
+                                [attr.poster]="(item.image === undefined || item.image === null ||item.image === '') ? 'banner-slider-ymacau/no-image.png' : item.image"
+                            >
+                                <source [src]="item?.src" type="video/mp4" />
+                            </video>
+                        </div>
+                    </div>
+                </ng-template>
+            </div>
+        </div>
+    </div>
+</div>

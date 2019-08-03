@@ -4,6 +4,6 @@
  * @suppress {suspiciousCode,uselessCode,missingProperties,missingOverride,checkTypes}
  * tslint:disable
  */ 
-var styles = [""];
+var styles = [".slick-slide[_ngcontent-%COMP%] {\n  position: relative;\n  height: 56.25vw;\n}\n\n.slick-slide[_ngcontent-%COMP%]   iframe[_ngcontent-%COMP%] {\n  position: relative;\n  pointer-events: none;\n}\n\n.slick-slide[_ngcontent-%COMP%]   .slide-image[_ngcontent-%COMP%] {\n  opacity: 0;\n  height: 100%;\n  background-size: cover;\n  background-position: center;\n  transition: all .8s ease;\n}\n\n.slick-slide[_ngcontent-%COMP%]   .slide-image.show[_ngcontent-%COMP%] {\n  opacity: 1;\n}\n\n.slick-slide[_ngcontent-%COMP%]   .image-entity[_ngcontent-%COMP%] {\n  width: 100%;\n  opacity: 0;\n  visibility: hidden;\n}\n\n.slick-dots[_ngcontent-%COMP%] {\n  display: none !important;\n}\n\n.item-wrapper[_ngcontent-%COMP%] {\n  width: 100vw;\n  height: 0;\n  padding-bottom: 56.25%;\n  padding-top: 30px;\n  position: relative;\n  overflow: hidden;\n}\n\n.item-wrapper[_ngcontent-%COMP%]   .slide-media[_ngcontent-%COMP%] {\n  width: 100vw;\n  height: 100%;\n  position: absolute;\n  top: 0;\n  left: 0;\n  // object-fit: cover;\n}"];
 export { styles as styles };
 //# sourceMappingURL=banner-slider.scss.shim.ngstyle.js.map

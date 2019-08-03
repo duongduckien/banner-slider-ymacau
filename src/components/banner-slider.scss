@@ -1,0 +1,49 @@
+.slick-slide {
+  position: relative;
+  height: 56.25vw;
+}
+
+.slick-slide iframe {
+  position: relative;
+  pointer-events: none;
+}
+
+.slick-slide .slide-image {
+  opacity: 0;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  transition: all .8s ease;
+}
+
+.slick-slide .slide-image.show {
+  opacity: 1;
+}
+
+.slick-slide .image-entity {
+  width: 100%;
+  opacity: 0;
+  visibility: hidden;
+}
+
+.slick-dots {
+  display: none !important;
+}
+
+.item-wrapper {
+  width: 100vw;
+  height: 0;
+  padding-bottom: 56.25%;
+  padding-top: 30px;
+  position: relative;
+  overflow: hidden;
+}
+
+.item-wrapper .slide-media {
+  width: 100vw;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  // object-fit: cover;
+}
