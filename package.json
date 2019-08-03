@@ -1,6 +1,6 @@
 {
   "name": "banner-slider-ymacau",
-  "version": "0.0.5",
+  "version": "0.0.7",
   "description": "",
   "main": "./dist/src/index.js",
   "typings": "./dist/src/index.d.ts",
@@ -8,7 +8,6 @@
   "scripts": {
     "ngc": "ngc",
     "build": "rm -rf aot dist && npm run ngc && npm run copy:assets",
-    "publish": "npm run build && npm publish",
     "copy:assets": "cpx 'src/assets/**' 'dist/src/assets'"
   },
   "repository": {
