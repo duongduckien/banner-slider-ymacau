@@ -13,52 +13,68 @@ var BannerSliderComponent = /** @class */ (function () {
     function BannerSliderComponent(zone, domSanitizer) {
         this.zone = zone;
         this.domSanitizer = domSanitizer;
+        this.initialized = false;
+        this.packageName = 'Banner Slider YMacau';
     }
     BannerSliderComponent.prototype.ngOnInit = function () {
     };
     BannerSliderComponent.prototype.ngOnChanges = function () {
     };
     BannerSliderComponent.prototype.ngAfterViewInit = function () {
-        var _this = this;
+        this.ngAfterViewChecked();
+    };
+    BannerSliderComponent.prototype.ngAfterViewChecked = function () {
         if (this.slider.length > 0) {
-            this.slideWrapper = jQuery('.main-slider');
-            this.lazyImages = this.slideWrapper.find('.slide-image');
-            this.zone.runOutsideAngular(function () {
-                _this.slideWrapper.on('init', function (el) {
-                    _this.zone.run(function () {
-                        el = jQuery(el.currentTarget);
-                        _this.handleActionVideo(el, 'play');
-                    });
-                });
-                _this.slideWrapper.on('beforeChange', function (el) {
-                    _this.zone.run(function () {
-                        el = jQuery(el.currentTarget);
-                        _this.handleActionVideo(el, 'pause');
-                    });
-                });
-                _this.slideWrapper.on('afterChange', function (el) {
-                    _this.zone.run(function () {
-                        el = jQuery(el.currentTarget);
-                        _this.handleActionVideo(el, 'play');
-                    });
-                });
-                _this.slideWrapper.on('lazyLoaded', function (el) {
-                    _this.zone.run(function () {
-                        _this.lazyImages.addClass('show');
-                    });
-                });
-                _this.slideWrapper.slick({
-                    autoplaySpeed: 4000,
-                    lazyLoad: 'progressive',
-                    speed: 600,
-                    arrows: false,
-                    dots: true,
-                    mobileFirst: true,
-                    waitForAnimate: false,
-                    adaptiveHeight: true,
+            if (!this.initialized) {
+                this.initSlider();
+            }
+        }
+    };
+    BannerSliderComponent.prototype.initSlider = function () {
+        var _this = this;
+        this.zone.runOutsideAngular(function () {
+            _this.slideWrapper = jQuery('.main-slider');
+            _this.lazyImages = _this.slideWrapper.find('.slide-image');
+            _this.slideWrapper.on('init', function (el) {
+                _this.zone.run(function () {
+                    _this.initialized = true;
+                    el = jQuery(el.currentTarget);
+                    _this.handleActionVideo(el, 'play');
                 });
             });
-        }
+            _this.slideWrapper.on('beforeChange', function (el) {
+                _this.zone.run(function () {
+                    el = jQuery(el.currentTarget);
+                    _this.handleActionVideo(el, 'pause');
+                });
+            });
+            _this.slideWrapper.on('afterChange', function (el) {
+                _this.zone.run(function () {
+                    el = jQuery(el.currentTarget);
+                    _this.handleActionVideo(el, 'play');
+                });
+            });
+            _this.slideWrapper.on('lazyLoaded', function (el) {
+                _this.zone.run(function () {
+                    _this.lazyImages.addClass('show');
+                });
+            });
+            _this.slideWrapper.on('destroy', function (event, slick) {
+                _this.zone.run(function () {
+                    _this.initialized = false;
+                });
+            });
+            _this.slideWrapper.slick({
+                autoplaySpeed: 4000,
+                lazyLoad: 'progressive',
+                speed: 600,
+                arrows: false,
+                dots: true,
+                mobileFirst: true,
+                waitForAnimate: false,
+                adaptiveHeight: true,
+            });
+        });
     };
     /**
      * @param  {any} player
@@ -148,10 +164,21 @@ var BannerSliderComponent = /** @class */ (function () {
             }
         }
     };
+    /**
+     * @param  {any} params
+     */
     BannerSliderComponent.prototype.queryParams = function (params) {
         return Object.keys(params).map(function (key) { return key + "=" + params[key]; }).join('&');
     };
     BannerSliderComponent.prototype.ngOnDestroy = function () {
+        this.slideWrapper = undefined;
+    };
+    /**
+     * @param  {string} label
+     * @param  {any} data
+     */
+    BannerSliderComponent.prototype.debug = function (label, data) {
+        console.log(this.packageName + ": ", label, data);
     };
     __decorate([
         Input(),

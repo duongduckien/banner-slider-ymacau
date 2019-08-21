@@ -6,6 +6,7 @@ import {
     OnDestroy,
     OnChanges,
     AfterViewInit,
+    AfterViewChecked,
 } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
 
@@ -16,13 +17,15 @@ declare const jQuery: any;
     templateUrl: 'banner-slider.html',
     styleUrls: ['banner-slider.scss']
 })
-export class BannerSliderComponent implements OnDestroy, OnChanges, AfterViewInit {
+export class BannerSliderComponent implements OnDestroy, OnChanges, AfterViewInit, AfterViewChecked {
 
     @Input() config: any;
     @Input() slider: any;
 
     private slideWrapper: any;
     private lazyImages: any;
+    private initialized: boolean = false;
+    private packageName: string = 'Banner Slider YMacau';
 
     constructor(
         public zone: NgZone,
@@ -40,55 +43,70 @@ export class BannerSliderComponent implements OnDestroy, OnChanges, AfterViewIni
     }
 
     ngAfterViewInit(): void {
+        this.ngAfterViewChecked();
+    }
 
+    ngAfterViewChecked() {
         if (this.slider.length > 0) {
+            if (!this.initialized) {
+                this.initSlider();
+            }
+        }
+    }
+
+    initSlider() {
+
+        this.zone.runOutsideAngular(() => {
 
             this.slideWrapper = jQuery('.main-slider');
             this.lazyImages = this.slideWrapper.find('.slide-image');
 
-            this.zone.runOutsideAngular(() => {
-
-                this.slideWrapper.on('init', (el: any) => {
-                    this.zone.run(() => {
-                        el = jQuery(el.currentTarget);
-                        this.handleActionVideo(el, 'play');
-                    });
+            this.slideWrapper.on('init', (el: any) => {
+                this.zone.run(() => {
+                    this.initialized = true;
+                    el = jQuery(el.currentTarget);
+                    this.handleActionVideo(el, 'play');
                 });
-
-                this.slideWrapper.on('beforeChange', (el: any) => {
-                    this.zone.run(() => {
-                        el = jQuery(el.currentTarget);
-                        this.handleActionVideo(el, 'pause');
-                    });
-                });
-
-                this.slideWrapper.on('afterChange', (el: any) => {
-                    this.zone.run(() => {
-                        el = jQuery(el.currentTarget);
-                        this.handleActionVideo(el, 'play');
-                    });
-                });
-
-                this.slideWrapper.on('lazyLoaded', (el: any) => {
-                    this.zone.run(() => {
-                        this.lazyImages.addClass('show');
-                    });
-                });
-
-                this.slideWrapper.slick({
-                    autoplaySpeed: 4000,
-                    lazyLoad: 'progressive',
-                    speed: 600,
-                    arrows: false,
-                    dots: true,
-                    mobileFirst: true,
-                    waitForAnimate: false,
-                    adaptiveHeight: true,
-                });
-
             });
 
-        }
+            this.slideWrapper.on('beforeChange', (el: any) => {
+                this.zone.run(() => {
+                    el = jQuery(el.currentTarget);
+                    this.handleActionVideo(el, 'pause');
+                });
+            });
+
+            this.slideWrapper.on('afterChange', (el: any) => {
+                this.zone.run(() => {
+                    el = jQuery(el.currentTarget);
+                    this.handleActionVideo(el, 'play');
+                });
+            });
+
+            this.slideWrapper.on('lazyLoaded', (el: any) => {
+                this.zone.run(() => {
+                    this.lazyImages.addClass('show');
+                });
+            });
+
+            this.slideWrapper.on('destroy', (event, slick) => {
+                this.zone.run(() => {
+                    this.initialized = false;
+                });
+            });
+
+            this.slideWrapper.slick({
+                autoplaySpeed: 4000,
+                lazyLoad: 'progressive',
+                speed: 600,
+                arrows: false,
+                dots: true,
+                mobileFirst: true,
+                waitForAnimate: false,
+                adaptiveHeight: true,
+            });
+
+        });
 
     }
 
@@ -183,12 +201,23 @@ export class BannerSliderComponent implements OnDestroy, OnChanges, AfterViewIni
         }
     }
 
+    /**
+     * @param  {any} params
+     */
     queryParams(params: any) {
         return Object.keys(params).map((key: any) => `${key}=${params[key]}`).join('&');
     }
 
     ngOnDestroy() {
+        this.slideWrapper = undefined;
+    }
 
+    /**
+     * @param  {string} label
+     * @param  {any} data
+     */
+    debug(label: string, data: any) {
+        console.log(`${this.packageName}: `, label, data);
     }
 
 }
