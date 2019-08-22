@@ -1,14 +1,17 @@
-import { NgZone, OnDestroy, OnChanges, AfterViewInit, AfterViewChecked } from '@angular/core';
+import { NgZone, OnDestroy, OnChanges, AfterViewInit, AfterViewChecked, EventEmitter } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
 export declare class BannerSliderComponent implements OnDestroy, OnChanges, AfterViewInit, AfterViewChecked {
     zone: NgZone;
     domSanitizer: DomSanitizer;
     config: any;
     slider: any;
+    networkType: any;
+    afterChange: EventEmitter<any>;
     private slideWrapper;
     private lazyImages;
     private initialized;
     private packageName;
+    private isAutoPlay;
     constructor(zone: NgZone, domSanitizer: DomSanitizer);
     ngOnInit(): void;
     ngOnChanges(): void;
@@ -21,7 +24,7 @@ export declare class BannerSliderComponent implements OnDestroy, OnChanges, Afte
      */
     postMessageToPlayer(player: any, command: any): void;
     /**
-     * @param  {any} slick
+     * @param  {any} element
      * @param  {any} control
      */
     handleActionVideo(element: any, control: any): void;

@@ -7,18 +7,24 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-import { Component, NgZone, Input, } from '@angular/core';
+import { Component, NgZone, Input, Output, EventEmitter, } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
 var BannerSliderComponent = /** @class */ (function () {
     function BannerSliderComponent(zone, domSanitizer) {
         this.zone = zone;
         this.domSanitizer = domSanitizer;
+        this.afterChange = new EventEmitter();
         this.initialized = false;
         this.packageName = 'Banner Slider YMacau';
+        this.isAutoPlay = true;
     }
     BannerSliderComponent.prototype.ngOnInit = function () {
     };
     BannerSliderComponent.prototype.ngOnChanges = function () {
+        console.log('Network type', this.networkType);
+        if (this.networkType === '3g' || this.networkType === '4g' || this.networkType === '5g') {
+            this.isAutoPlay = false;
+        }
     };
     BannerSliderComponent.prototype.ngAfterViewInit = function () {
         this.ngAfterViewChecked();
@@ -51,6 +57,11 @@ var BannerSliderComponent = /** @class */ (function () {
             _this.slideWrapper.on('afterChange', function (el) {
                 _this.zone.run(function () {
                     el = jQuery(el.currentTarget);
+                    var currentIndex = el.find('.slick-current').attr('data-slick-index');
+                    _this.afterChange.emit({
+                        currentIndex: parseInt(currentIndex, 10) + 1,
+                        length: _this.slider.length,
+                    });
                     _this.handleActionVideo(el, 'play');
                 });
             });
@@ -87,61 +98,63 @@ var BannerSliderComponent = /** @class */ (function () {
         player.contentWindow.postMessage(JSON.stringify(command), '*');
     };
     /**
-     * @param  {any} slick
+     * @param  {any} element
      * @param  {any} control
      */
     BannerSliderComponent.prototype.handleActionVideo = function (element, control) {
         var currentSlide = element.find('.slick-current');
         var slideType = currentSlide.children().children().attr('class').split(' ')[1];
         var player = currentSlide.find('iframe').get(0);
-        if (slideType === 'vimeo') {
-            switch (control) {
-                case 'play': {
-                    this.postMessageToPlayer(player, {
-                        'method': 'play',
-                        'value': 1,
-                    });
-                    break;
-                }
-                case 'pause': {
-                    this.postMessageToPlayer(player, {
-                        'method': 'pause',
-                        'value': 1,
-                    });
-                    break;
-                }
-            }
-        }
-        else if (slideType === 'youtube') {
-            switch (control) {
-                case 'play': {
-                    this.postMessageToPlayer(player, {
-                        'event': 'command',
-                        'func': 'mute',
-                    });
-                    this.postMessageToPlayer(player, {
-                        'event': 'command',
-                        'func': 'playVideo',
-                    });
-                    break;
-                }
-                case 'pause': {
-                    this.postMessageToPlayer(player, {
-                        'event': 'command',
-                        'func': 'pauseVideo',
-                    });
-                    break;
+        if (this.isAutoPlay) {
+            if (slideType === 'vimeo') {
+                switch (control) {
+                    case 'play': {
+                        this.postMessageToPlayer(player, {
+                            'method': 'play',
+                            'value': 1,
+                        });
+                        break;
+                    }
+                    case 'pause': {
+                        this.postMessageToPlayer(player, {
+                            'method': 'pause',
+                            'value': 1,
+                        });
+                        break;
+                    }
                 }
             }
-        }
-        else if (slideType === 'video') {
-            var video = currentSlide.children().children().children().children('video').get(0);
-            if (video != null) {
-                if (control === 'play') {
-                    video.play();
+            else if (slideType === 'youtube') {
+                switch (control) {
+                    case 'play': {
+                        // this.postMessageToPlayer(player, {
+                        //     'event': 'command',
+                        //     'func': 'mute',
+                        // });
+                        this.postMessageToPlayer(player, {
+                            'event': 'command',
+                            'func': 'playVideo',
+                        });
+                        break;
+                    }
+                    case 'pause': {
+                        this.postMessageToPlayer(player, {
+                            'event': 'command',
+                            'func': 'pauseVideo',
+                        });
+                        break;
+                    }
                 }
-                else {
-                    video.pause();
+            }
+            else if (slideType === 'video') {
+                var video = currentSlide.children().children().children().children('video').get(0);
+                if (video != null) {
+                    if (control === 'play') {
+                        video.play();
+                    }
+                    else {
+                        video.pause();
+                    }
                 }
             }
         }
@@ -156,9 +169,11 @@ var BannerSliderComponent = /** @class */ (function () {
         if (vimeoConfig && youtubeConfig) {
             switch (type) {
                 case 'youtube': {
+                    console.log(url + "?" + this.queryParams(youtubeConfig));
                     return url + "?" + this.queryParams(youtubeConfig);
                 }
                 case 'vimeo': {
+                    console.log(url + "?" + this.queryParams(vimeoConfig));
                     return url + "?" + this.queryParams(vimeoConfig);
                 }
             }
@@ -188,6 +203,14 @@ var BannerSliderComponent = /** @class */ (function () {
         Input(),
         __metadata("design:type", Object)
     ], BannerSliderComponent.prototype, "slider", void 0);
+    __decorate([
+        Input(),
+        __metadata("design:type", Object)
+    ], BannerSliderComponent.prototype, "networkType", void 0);
+    __decorate([
+        Output(),
+        __metadata("design:type", EventEmitter)
+    ], BannerSliderComponent.prototype, "afterChange", void 0);
     BannerSliderComponent = __decorate([
         Component({
             selector: 'banner-slider-ymacau',

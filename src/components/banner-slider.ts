@@ -2,11 +2,13 @@ import {
     Component,
     NgZone,
     Input,
+    Output,
     ElementRef,
     OnDestroy,
     OnChanges,
     AfterViewInit,
     AfterViewChecked,
+    EventEmitter,
 } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
 
@@ -21,11 +23,15 @@ export class BannerSliderComponent implements OnDestroy, OnChanges, AfterViewIni
 
     @Input() config: any;
     @Input() slider: any;
+    @Input() networkType: any;
+
+    @Output() afterChange: EventEmitter<any> = new EventEmitter();
 
     private slideWrapper: any;
     private lazyImages: any;
     private initialized: boolean = false;
     private packageName: string = 'Banner Slider YMacau';
+    private isAutoPlay: boolean = true;
 
     constructor(
         public zone: NgZone,
@@ -39,7 +45,9 @@ export class BannerSliderComponent implements OnDestroy, OnChanges, AfterViewIni
     }
 
     ngOnChanges() {
-
+        if (this.networkType === '3g' || this.networkType === '4g' || this.networkType === '5g') {
+            this.isAutoPlay = false;
+        }
     }
 
     ngAfterViewInit(): void {
@@ -79,6 +87,11 @@ export class BannerSliderComponent implements OnDestroy, OnChanges, AfterViewIni
             this.slideWrapper.on('afterChange', (el: any) => {
                 this.zone.run(() => {
                     el = jQuery(el.currentTarget);
+                    const currentIndex = el.find('.slick-current').attr('data-slick-index');
+                    this.afterChange.emit({
+                        currentIndex: parseInt(currentIndex, 10) + 1,
+                        length: this.slider.length,
+                    });
                     this.handleActionVideo(el, 'play');
                 });
             });
@@ -122,7 +135,7 @@ export class BannerSliderComponent implements OnDestroy, OnChanges, AfterViewIni
     }
 
     /**
-     * @param  {any} slick
+     * @param  {any} element
      * @param  {any} control
      */
     handleActionVideo(element: any, control: any) {
@@ -131,51 +144,49 @@ export class BannerSliderComponent implements OnDestroy, OnChanges, AfterViewIni
         let slideType = currentSlide.children().children().attr('class').split(' ')[1];
         let player = currentSlide.find('iframe').get(0);
 
-        if (slideType === 'vimeo') {
-            switch (control) {
-                case 'play': {
-                    this.postMessageToPlayer(player, {
-                        'method': 'play',
-                        'value': 1,
-                    });
-                    break;
+        if (this.isAutoPlay) {
+            if (slideType === 'vimeo') {
+                switch (control) {
+                    case 'play': {
+                        this.postMessageToPlayer(player, {
+                            'method': 'play',
+                            'value': 1,
+                        });
+                        break;
+                    }
+                    case 'pause': {
+                        this.postMessageToPlayer(player, {
+                            'method': 'pause',
+                            'value': 1,
+                        });
+                        break;
+                    }
                 }
-                case 'pause': {
-                    this.postMessageToPlayer(player, {
-                        'method': 'pause',
-                        'value': 1,
-                    });
-                    break;
+            } else if (slideType === 'youtube') {
+                switch (control) {
+                    case 'play': {
+                        this.postMessageToPlayer(player, {
+                            'event': 'command',
+                            'func': 'playVideo',
+                        });
+                        break;
+                    }
+                    case 'pause': {
+                        this.postMessageToPlayer(player, {
+                            'event': 'command',
+                            'func': 'pauseVideo',
+                        });
+                        break;
+                    }
                 }
-            }
-        } else if (slideType === 'youtube') {
-            switch (control) {
-                case 'play': {
-                    this.postMessageToPlayer(player, {
-                        'event': 'command',
-                        'func': 'mute',
-                    });
-                    this.postMessageToPlayer(player, {
-                        'event': 'command',
-                        'func': 'playVideo',
-                    });
-                    break;
-                }
-                case 'pause': {
-                    this.postMessageToPlayer(player, {
-                        'event': 'command',
-                        'func': 'pauseVideo',
-                    });
-                    break;
-                }
-            }
-        } else if (slideType === 'video') {
-            const video = currentSlide.children().children().children().children('video').get(0);
-            if (video != null) {
-                if (control === 'play') {
-                    video.play();
-                } else {
-                    video.pause();
+            } else if (slideType === 'video') {
+                const video = currentSlide.children().children().children().children('video').get(0);
+                if (video != null) {
+                    if (control === 'play') {
+                        video.play();
+                    } else {
+                        video.pause();
+                    }
                 }
             }
         }
