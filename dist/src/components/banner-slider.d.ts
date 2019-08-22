@@ -6,12 +6,15 @@ export declare class BannerSliderComponent implements OnDestroy, OnChanges, Afte
     config: any;
     slider: any;
     networkType: any;
+    onClickEvent: any;
     afterChange: EventEmitter<any>;
     private slideWrapper;
     private lazyImages;
     private initialized;
     private packageName;
     private isAutoPlay;
+    private currentEl;
+    private statusPlayVideoOnNetwork;
     constructor(zone: NgZone, domSanitizer: DomSanitizer);
     ngOnInit(): void;
     ngOnChanges(): void;

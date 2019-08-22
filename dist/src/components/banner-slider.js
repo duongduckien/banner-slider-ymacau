@@ -17,13 +17,24 @@ var BannerSliderComponent = /** @class */ (function () {
         this.initialized = false;
         this.packageName = 'Banner Slider YMacau';
         this.isAutoPlay = true;
+        this.statusPlayVideoOnNetwork = false;
     }
     BannerSliderComponent.prototype.ngOnInit = function () {
     };
     BannerSliderComponent.prototype.ngOnChanges = function () {
-        console.log('Network type', this.networkType);
+        console.log(this.onClickEvent);
         if (this.networkType === '3g' || this.networkType === '4g' || this.networkType === '5g') {
             this.isAutoPlay = false;
+        }
+        if (this.currentEl && !this.isAutoPlay && this.onClickEvent) {
+            if (this.statusPlayVideoOnNetwork) {
+                this.handleActionVideo(this.currentEl, 'pause');
+                this.statusPlayVideoOnNetwork = false;
+            }
+            else {
+                this.handleActionVideo(this.currentEl, 'play');
+                this.statusPlayVideoOnNetwork = true;
+            }
         }
     };
     BannerSliderComponent.prototype.ngAfterViewInit = function () {
@@ -45,24 +56,36 @@ var BannerSliderComponent = /** @class */ (function () {
                 _this.zone.run(function () {
                     _this.initialized = true;
                     el = jQuery(el.currentTarget);
-                    _this.handleActionVideo(el, 'play');
+                    if (_this.isAutoPlay) {
+                        _this.handleActionVideo(el, 'play');
+                    }
                 });
             });
             _this.slideWrapper.on('beforeChange', function (el) {
                 _this.zone.run(function () {
+                    // Pause video when swipe slider when type of the network isn't wifi
+                    if (_this.currentEl && !_this.isAutoPlay) {
+                        _this.handleActionVideo(_this.currentEl, 'pause');
+                    }
                     el = jQuery(el.currentTarget);
-                    _this.handleActionVideo(el, 'pause');
+                    if (_this.isAutoPlay) {
+                        _this.handleActionVideo(el, 'pause');
+                    }
                 });
             });
             _this.slideWrapper.on('afterChange', function (el) {
                 _this.zone.run(function () {
                     el = jQuery(el.currentTarget);
+                    _this.currentEl = el;
                     var currentIndex = el.find('.slick-current').attr('data-slick-index');
                     _this.afterChange.emit({
                         currentIndex: parseInt(currentIndex, 10) + 1,
                         length: _this.slider.length,
                     });
-                    _this.handleActionVideo(el, 'play');
+                    _this.statusPlayVideoOnNetwork = false;
+                    if (_this.isAutoPlay) {
+                        _this.handleActionVideo(el, 'play');
+                    }
                 });
             });
             _this.slideWrapper.on('lazyLoaded', function (el) {
@@ -105,56 +128,50 @@ var BannerSliderComponent = /** @class */ (function () {
         var currentSlide = element.find('.slick-current');
         var slideType = currentSlide.children().children().attr('class').split(' ')[1];
         var player = currentSlide.find('iframe').get(0);
-        if (this.isAutoPlay) {
-            if (slideType === 'vimeo') {
-                switch (control) {
-                    case 'play': {
-                        this.postMessageToPlayer(player, {
-                            'method': 'play',
-                            'value': 1,
-                        });
-                        break;
-                    }
-                    case 'pause': {
-                        this.postMessageToPlayer(player, {
-                            'method': 'pause',
-                            'value': 1,
-                        });
-                        break;
-                    }
+        if (slideType === 'vimeo') {
+            switch (control) {
+                case 'play': {
+                    this.postMessageToPlayer(player, {
+                        'method': 'play',
+                        'value': 1,
+                    });
+                    break;
+                }
+                case 'pause': {
+                    this.postMessageToPlayer(player, {
+                        'method': 'pause',
+                        'value': 1,
+                    });
+                    break;
                 }
             }
-            else if (slideType === 'youtube') {
-                switch (control) {
-                    case 'play': {
-                        // this.postMessageToPlayer(player, {
-                        //     'event': 'command',
-                        //     'func': 'mute',
-                        // });
-                        this.postMessageToPlayer(player, {
-                            'event': 'command',
-                            'func': 'playVideo',
-                        });
-                        break;
-                    }
-                    case 'pause': {
-                        this.postMessageToPlayer(player, {
-                            'event': 'command',
-                            'func': 'pauseVideo',
-                        });
-                        break;
-                    }
+        }
+        else if (slideType === 'youtube') {
+            switch (control) {
+                case 'play': {
+                    this.postMessageToPlayer(player, {
+                        'event': 'command',
+                        'func': 'playVideo',
+                    });
+                    break;
+                }
+                case 'pause': {
+                    this.postMessageToPlayer(player, {
+                        'event': 'command',
+                        'func': 'pauseVideo',
+                    });
+                    break;
                 }
             }
-            else if (slideType === 'video') {
-                var video = currentSlide.children().children().children().children('video').get(0);
-                if (video != null) {
-                    if (control === 'play') {
-                        video.play();
-                    }
-                    else {
-                        video.pause();
-                    }
+        }
+        else if (slideType === 'video') {
+            var video = currentSlide.children().children().children().children('video').get(0);
+            if (video != null) {
+                if (control === 'play') {
+                    video.play();
+                }
+                else {
+                    video.pause();
                 }
             }
         }
@@ -169,11 +186,9 @@ var BannerSliderComponent = /** @class */ (function () {
         if (vimeoConfig && youtubeConfig) {
             switch (type) {
                 case 'youtube': {
-                    console.log(url + "?" + this.queryParams(youtubeConfig));
                     return url + "?" + this.queryParams(youtubeConfig);
                 }
                 case 'vimeo': {
-                    console.log(url + "?" + this.queryParams(vimeoConfig));
                     return url + "?" + this.queryParams(vimeoConfig);
                 }
             }
@@ -207,6 +222,10 @@ var BannerSliderComponent = /** @class */ (function () {
         Input(),
         __metadata("design:type", Object)
     ], BannerSliderComponent.prototype, "networkType", void 0);
+    __decorate([
+        Input(),
+        __metadata("design:type", Object)
+    ], BannerSliderComponent.prototype, "onClickEvent", void 0);
     __decorate([
         Output(),
         __metadata("design:type", EventEmitter)

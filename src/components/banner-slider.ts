@@ -24,6 +24,7 @@ export class BannerSliderComponent implements OnDestroy, OnChanges, AfterViewIni
     @Input() config: any;
     @Input() slider: any;
     @Input() networkType: any;
+    @Input() onClickEvent: any;
 
     @Output() afterChange: EventEmitter<any> = new EventEmitter();
 
@@ -32,6 +33,8 @@ export class BannerSliderComponent implements OnDestroy, OnChanges, AfterViewIni
     private initialized: boolean = false;
     private packageName: string = 'Banner Slider YMacau';
     private isAutoPlay: boolean = true;
+    private currentEl: any;
+    private statusPlayVideoOnNetwork: boolean = false;
 
     constructor(
         public zone: NgZone,
@@ -45,8 +48,18 @@ export class BannerSliderComponent implements OnDestroy, OnChanges, AfterViewIni
     }
 
     ngOnChanges() {
+        console.log(this.onClickEvent);
         if (this.networkType === '3g' || this.networkType === '4g' || this.networkType === '5g') {
             this.isAutoPlay = false;
+        }
+        if (this.currentEl && !this.isAutoPlay && this.onClickEvent) {
+            if (this.statusPlayVideoOnNetwork) {
+                this.handleActionVideo(this.currentEl, 'pause');
+                this.statusPlayVideoOnNetwork = false;
+            } else {
+                this.handleActionVideo(this.currentEl, 'play');
+                this.statusPlayVideoOnNetwork = true;
+            }
         }
     }
 
@@ -73,26 +86,44 @@ export class BannerSliderComponent implements OnDestroy, OnChanges, AfterViewIni
                 this.zone.run(() => {
                     this.initialized = true;
                     el = jQuery(el.currentTarget);
-                    this.handleActionVideo(el, 'play');
+                    if (this.isAutoPlay) {
+                        this.handleActionVideo(el, 'play');
+                    }
                 });
             });
 
             this.slideWrapper.on('beforeChange', (el: any) => {
                 this.zone.run(() => {
+
+                    // Pause video when swipe slider when type of the network isn't wifi
+                    if (this.currentEl && !this.isAutoPlay) {
+                        this.handleActionVideo(this.currentEl, 'pause');
+                    }
+                    
                     el = jQuery(el.currentTarget);
-                    this.handleActionVideo(el, 'pause');
+                    if (this.isAutoPlay) {
+                        this.handleActionVideo(el, 'pause');
+                    }
                 });
             });
 
             this.slideWrapper.on('afterChange', (el: any) => {
                 this.zone.run(() => {
+
                     el = jQuery(el.currentTarget);
+                    this.currentEl = el;
                     const currentIndex = el.find('.slick-current').attr('data-slick-index');
                     this.afterChange.emit({
                         currentIndex: parseInt(currentIndex, 10) + 1,
                         length: this.slider.length,
                     });
-                    this.handleActionVideo(el, 'play');
+
+                    this.statusPlayVideoOnNetwork = false;
+
+                    if (this.isAutoPlay) {
+                        this.handleActionVideo(el, 'play');
+                    }
+
                 });
             });
 
@@ -144,49 +175,47 @@ export class BannerSliderComponent implements OnDestroy, OnChanges, AfterViewIni
         let slideType = currentSlide.children().children().attr('class').split(' ')[1];
         let player = currentSlide.find('iframe').get(0);
 
-        if (this.isAutoPlay) {
-            if (slideType === 'vimeo') {
-                switch (control) {
-                    case 'play': {
-                        this.postMessageToPlayer(player, {
-                            'method': 'play',
-                            'value': 1,
-                        });
-                        break;
-                    }
-                    case 'pause': {
-                        this.postMessageToPlayer(player, {
-                            'method': 'pause',
-                            'value': 1,
-                        });
-                        break;
-                    }
+        if (slideType === 'vimeo') {
+            switch (control) {
+                case 'play': {
+                    this.postMessageToPlayer(player, {
+                        'method': 'play',
+                        'value': 1,
+                    });
+                    break;
                 }
-            } else if (slideType === 'youtube') {
-                switch (control) {
-                    case 'play': {
-                        this.postMessageToPlayer(player, {
-                            'event': 'command',
-                            'func': 'playVideo',
-                        });
-                        break;
-                    }
-                    case 'pause': {
-                        this.postMessageToPlayer(player, {
-                            'event': 'command',
-                            'func': 'pauseVideo',
-                        });
-                        break;
-                    }
+                case 'pause': {
+                    this.postMessageToPlayer(player, {
+                        'method': 'pause',
+                        'value': 1,
+                    });
+                    break;
                 }
-            } else if (slideType === 'video') {
-                const video = currentSlide.children().children().children().children('video').get(0);
-                if (video != null) {
-                    if (control === 'play') {
-                        video.play();
-                    } else {
-                        video.pause();
-                    }
+            }
+        } else if (slideType === 'youtube') {
+            switch (control) {
+                case 'play': {
+                    this.postMessageToPlayer(player, {
+                        'event': 'command',
+                        'func': 'playVideo',
+                    });
+                    break;
+                }
+                case 'pause': {
+                    this.postMessageToPlayer(player, {
+                        'event': 'command',
+                        'func': 'pauseVideo',
+                    });
+                    break;
+                }
+            }
+        } else if (slideType === 'video') {
+            const video = currentSlide.children().children().children().children('video').get(0);
+            if (video != null) {
+                if (control === 'play') {
+                    video.play();
+                } else {
+                    video.pause();
                 }
             }
         }
