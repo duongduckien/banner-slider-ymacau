@@ -22,7 +22,6 @@ var BannerSliderComponent = /** @class */ (function () {
     BannerSliderComponent.prototype.ngOnInit = function () {
     };
     BannerSliderComponent.prototype.ngOnChanges = function () {
-        console.log(this.onClickEvent);
         if (this.networkType === '3g' || this.networkType === '4g' || this.networkType === '5g') {
             this.isAutoPlay = false;
         }
