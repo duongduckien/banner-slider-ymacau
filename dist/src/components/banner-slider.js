@@ -54,6 +54,10 @@ var BannerSliderComponent = /** @class */ (function () {
             _this.slideWrapper.on('init', function (el) {
                 _this.zone.run(function () {
                     _this.initialized = true;
+                    _this.afterChange.emit({
+                        currentIndex: 1,
+                        length: _this.slider.length,
+                    });
                     el = jQuery(el.currentTarget);
                     if (_this.isAutoPlay) {
                         _this.handleActionVideo(el, 'play');
@@ -99,13 +103,14 @@ var BannerSliderComponent = /** @class */ (function () {
             });
             _this.slideWrapper.slick({
                 autoplaySpeed: 4000,
-                lazyLoad: 'progressive',
+                lazyLoad: 'ondemand',
                 speed: 600,
                 arrows: false,
-                dots: true,
+                dots: false,
                 mobileFirst: true,
                 waitForAnimate: false,
                 adaptiveHeight: true,
+                touchThreshold: 20
             });
         });
     };

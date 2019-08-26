@@ -84,6 +84,10 @@ export class BannerSliderComponent implements OnDestroy, OnChanges, AfterViewIni
             this.slideWrapper.on('init', (el: any) => {
                 this.zone.run(() => {
                     this.initialized = true;
+                    this.afterChange.emit({
+                        currentIndex: 1,
+                        length: this.slider.length,
+                    });
                     el = jQuery(el.currentTarget);
                     if (this.isAutoPlay) {
                         this.handleActionVideo(el, 'play');
@@ -141,13 +145,14 @@ export class BannerSliderComponent implements OnDestroy, OnChanges, AfterViewIni
 
             this.slideWrapper.slick({
                 autoplaySpeed: 4000,
-                lazyLoad: 'progressive',
+                lazyLoad: 'ondemand',
                 speed: 600,
                 arrows: false,
-                dots: true,
+                dots: false,
                 mobileFirst: true,
                 waitForAnimate: false,
                 adaptiveHeight: true,
+                touchThreshold: 20
             });
 
         });
